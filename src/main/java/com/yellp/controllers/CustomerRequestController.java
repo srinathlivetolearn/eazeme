@@ -34,7 +34,7 @@ public class CustomerRequestController {
         return ResponseEntity.ok(savedRequest);
     }
 
-    @RequestMapping(value = "/request",produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/request",produces = MediaType.APPLICATION_JSON_VALUE,method = {RequestMethod.GET})
     @ResponseBody
     public ResponseEntity<List<SupportRequestDao>> allRequests(@RequestParam(name = "requestid",defaultValue = "") String requestId) {
         List<SupportRequestDao> requests = supportRequestService.findRequest(requestId);

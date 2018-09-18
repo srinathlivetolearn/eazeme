@@ -1,9 +1,12 @@
 package com.yellp.interceptor;
 
+import com.yellp.services.ApiKeyValidationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,10 +19,20 @@ public class ApiKeyValidationInterceptor implements HandlerInterceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApiKeyValidationInterceptor.class);
     private static final String API_KEY_HEADER = "X-Api-Key";
 
+    @Autowired
+    private ApiKeyValidationService keyValidationService;
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
         String apiKey = request.getHeader(API_KEY_HEADER);
-        LOGGER.info(String.format("Requested with api key %s .",apiKey));
-        return true;
+        if(StringUtils.hasText(apiKey) && keyValidationService.validateApiKey(apiKey)) {
+            LOGGER.info(String.format("Requested with Api Key: %s",apiKey));
+            return true;
+        } else {
+            LOGGER.error(String.format("Requested api key %s not found.",apiKey));
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        }
+        return false;
     }
+
 }
