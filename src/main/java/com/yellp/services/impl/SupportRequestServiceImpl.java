@@ -24,9 +24,11 @@ public class SupportRequestServiceImpl implements SupportRequestService {
     private SupportRequestDao supportRequestDao;
 
     @Override
-    public SupportRequestDao acceptRequest(CustomerQueryDto customerQueryDto) {
+    @Transactional
+    public SupportRequestDao acceptRequest(CustomerQueryDto customerQueryDto, String apiUserId) {
+
         supportRequestDao.setRequestId(UUID.randomUUID().toString());
-        supportRequestDao.setUserId("user1"); //TODO remove hardcoding.
+        supportRequestDao.setUserId(apiUserId);
         supportRequestDao.setCustomerName(customerQueryDto.getName());
         supportRequestDao.setContact(customerQueryDto.getContact());
         supportRequestDao.setDescription(customerQueryDto.getDescription());
@@ -53,8 +55,8 @@ public class SupportRequestServiceImpl implements SupportRequestService {
 
     @Override
     @Transactional
-    public boolean processRequest(String requestid) {
-        int rowsAffected = supportRequestRepository.updateRequestStatusById(2,requestid);
+    public boolean processRequest(String requestId) {
+        int rowsAffected = supportRequestRepository.updateRequestStatusById(2,requestId);
         return rowsAffected > 0;
     }
 }

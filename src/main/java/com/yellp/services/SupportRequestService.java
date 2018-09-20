@@ -6,7 +6,7 @@ import com.yellp.dao.SupportRequestDao;
 import java.util.List;
 
 public interface SupportRequestService {
-    SupportRequestDao acceptRequest(CustomerQueryDto supportRequest);
+    SupportRequestDao acceptRequest(CustomerQueryDto supportRequest, String userId);
 
     List<SupportRequestDao> findRequest(String requestId);
 

@@ -25,11 +25,11 @@ public class ApiKeyValidationInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
         String apiKey = request.getHeader(API_KEY_HEADER);
-        if(StringUtils.hasText(apiKey) && keyValidationService.validateApiKey(apiKey)) {
-            LOGGER.info(String.format("Requested with Api Key: %s",apiKey));
+        if(StringUtils.hasText(apiKey) && keyValidationService.validateApiKey(apiKey,request,response)) {
+            LOGGER.info("Requested with Api Key: {}",apiKey);
             return true;
         } else {
-            LOGGER.error(String.format("Requested api key %s not found.",apiKey));
+            LOGGER.error("Requested api key {} not found.",apiKey);
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
         }
         return false;
