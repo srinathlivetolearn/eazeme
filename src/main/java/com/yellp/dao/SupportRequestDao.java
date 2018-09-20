@@ -4,12 +4,13 @@ import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Component
 @Entity
 @Table(name="SUPPORT_REQUEST")
-public class SupportRequestDao {
+public class SupportRequestDao implements Serializable {
     @Column(name = "requestid",nullable = false,updatable = false)
     @Id
     private String requestId;

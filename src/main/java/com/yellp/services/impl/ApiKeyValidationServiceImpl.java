@@ -21,7 +21,7 @@ public class ApiKeyValidationServiceImpl implements ApiKeyValidationService {
     public boolean validateApiKey(String apiKey, HttpServletRequest request, HttpServletResponse response) {
         ApiKeyRegistryDao keyInfo = repository.findByApiKey(apiKey);
         if(keyInfo != null && keyInfo.isValid()) {
-            HttpSession session = request.getSession(false);
+            HttpSession session = request.getSession();
             if(session != null) {
                 session.setAttribute(API_KEY_USER_ID.value(),keyInfo.getUserId());
             }

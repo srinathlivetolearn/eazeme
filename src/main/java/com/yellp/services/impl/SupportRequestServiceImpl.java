@@ -3,6 +3,7 @@ package com.yellp.services.impl;
 import com.yellp.dao.SupportRequestDao;
 import com.yellp.dto.request.CustomerQueryDto;
 import com.yellp.repository.SupportRequestRepository;
+import com.yellp.services.MessagePublisher;
 import com.yellp.services.SupportRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,9 @@ public class SupportRequestServiceImpl implements SupportRequestService {
     @Autowired
     private SupportRequestDao supportRequestDao;
 
+    @Autowired
+    private MessagePublisher messagePublisher;
+
     @Override
     @Transactional
     public SupportRequestDao acceptRequest(CustomerQueryDto customerQueryDto, String apiUserId) {
@@ -36,7 +40,9 @@ public class SupportRequestServiceImpl implements SupportRequestService {
         supportRequestDao.settPlusMin(customerQueryDto.gettPlusMinutes());
         supportRequestDao.setStatus(1);
 
-        return supportRequestRepository.save(supportRequestDao);
+        SupportRequestDao saved = supportRequestRepository.save(supportRequestDao);
+        messagePublisher.publishMessage(saved,apiUserId);
+        return saved;
     }
 
     @Override
