@@ -2,7 +2,6 @@ package com.yellp.controllers;
 
 import com.yellp.dao.SupportRequestDao;
 import com.yellp.dto.request.CustomerQueryDto;
-import com.yellp.services.ApiKeyValidationService;
 import com.yellp.services.SupportRequestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
