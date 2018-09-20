@@ -30,7 +30,6 @@ public class SupportRequestServiceImpl implements SupportRequestService {
     @Override
     @Transactional
     public SupportRequestDao acceptRequest(CustomerQueryDto customerQueryDto, String apiUserId) {
-
         supportRequestDao.setRequestId(UUID.randomUUID().toString());
         supportRequestDao.setUserId(apiUserId);
         supportRequestDao.setCustomerName(customerQueryDto.getName());
@@ -39,7 +38,6 @@ public class SupportRequestServiceImpl implements SupportRequestService {
         supportRequestDao.setRequestTime(new Timestamp(Instant.now().toEpochMilli()));
         supportRequestDao.settPlusMin(customerQueryDto.gettPlusMinutes());
         supportRequestDao.setStatus(1);
-
         SupportRequestDao saved = supportRequestRepository.save(supportRequestDao);
         messagePublisher.publishMessage(saved,apiUserId);
         return saved;

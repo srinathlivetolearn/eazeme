@@ -9,17 +9,14 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class RabbitmqMessagePublisher implements MessagePublisher {
+
     @Autowired
     private RabbitmqMessageProducer sender;
 
     @Override
-    public boolean publishMessage(Object message,String senderId) {
-        sender.send(message,buildExchange(senderId));
+    public boolean publishMessage(Object message,String routingKey) {
+        sender.send(message,routingKey);
         return true;
-    }
-
-    private Exchange buildExchange(String senderId) {
-        return ExchangeBuilder.directExchange(senderId).build();
     }
 
 }
