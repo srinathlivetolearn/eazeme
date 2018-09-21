@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import static org.springframework.amqp.core.MessageProperties.CONTENT_TYPE_JSON;
@@ -19,6 +20,7 @@ public class RabbitmqMessageProducer {
     private RabbitTemplate rabbitTemplate;
 
     @Autowired
+    @Qualifier("topicExchange")
     private Exchange exchange;
 
     public void send(Object message,String routingKey) {
