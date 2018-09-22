@@ -26,8 +26,7 @@ public class RabbitmqMessageProducer {
     public void send(Object message,String routingKey) {
         try {
             rabbitTemplate.convertAndSend(exchange.getName(), routingKey, getAsJson(message),
-                    msg ->
-                    {
+                    msg -> {
                         msg.getMessageProperties().setContentType(CONTENT_TYPE_JSON);
                         return msg;
                     });

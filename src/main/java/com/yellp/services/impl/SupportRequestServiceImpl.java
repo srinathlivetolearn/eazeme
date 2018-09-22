@@ -6,13 +6,14 @@ import com.yellp.repository.SupportRequestRepository;
 import com.yellp.services.MessagePublisher;
 import com.yellp.services.SupportRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,7 +38,10 @@ public class SupportRequestServiceImpl implements SupportRequestService {
         supportRequestDao.setDescription(customerQueryDto.getDescription());
         supportRequestDao.setRequestTime(new Timestamp(Instant.now().toEpochMilli()));
         supportRequestDao.settPlusMin(customerQueryDto.gettPlusMinutes());
-        supportRequestDao.setStatus(1);
+        if(customerQueryDto.gettPlusMinutes() == 0)
+            supportRequestDao.setStatus(1);
+        else
+            supportRequestDao.setStatus(0);
         SupportRequestDao saved = supportRequestRepository.save(supportRequestDao);
         messagePublisher.publishMessage(saved,apiUserId);
         return saved;
@@ -48,7 +52,7 @@ public class SupportRequestServiceImpl implements SupportRequestService {
         List<SupportRequestDao> results;
         if(StringUtils.hasText(requestId)) {
             SupportRequestDao request = supportRequestRepository.findByRequestId(requestId);
-            results = new ArrayList<>();
+            results = Collections.emptyList();
             if(request != null)
                 results.add(request);
         }else {
