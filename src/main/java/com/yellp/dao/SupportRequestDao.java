@@ -6,6 +6,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Objects;
 
 @Component
 @Entity
@@ -105,5 +106,39 @@ public class SupportRequestDao implements Serializable {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SupportRequestDao that = (SupportRequestDao) o;
+        return Objects.equals(requestId, that.requestId) &&
+                Objects.equals(userId, that.userId) &&
+                Objects.equals(customerName, that.customerName) &&
+                Objects.equals(contact, that.contact) &&
+                Objects.equals(status, that.status) &&
+                Objects.equals(description, that.description) &&
+                Objects.equals(tPlusMin, that.tPlusMin);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(requestId, userId, customerName, contact, status, description, tPlusMin);
+    }
+
+    @Override
+    public String toString() {
+        return "SupportRequestDao{" +
+                "requestId='" + requestId + '\'' +
+                ", userId='" + userId + '\'' +
+                ", customerName='" + customerName + '\'' +
+                ", contact='" + contact + '\'' +
+                ", status=" + status +
+                ", description='" + description + '\'' +
+                ", referrer='" + referrer + '\'' +
+                ", requestTime=" + requestTime +
+                ", tPlusMin=" + tPlusMin +
+                '}';
     }
 }
