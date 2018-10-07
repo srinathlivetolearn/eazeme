@@ -1,8 +1,10 @@
 package com.yellp.controllers;
 
 import com.yellp.dao.SupportRequestDao;
+import com.yellp.dao.UserEntity;
 import com.yellp.dto.request.CustomerQueryDto;
 import com.yellp.services.SupportRequestService;
+import com.yellp.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -25,6 +28,9 @@ public class CustomerRequestController {
     @Autowired
     private SupportRequestService supportRequestService;
 
+    @Autowired
+    private UserService userService;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CustomerRequestController.class);
 
     @PostMapping(value="/callme",produces=MediaType.APPLICATION_JSON_VALUE)
@@ -37,6 +43,12 @@ public class CustomerRequestController {
                 (String) session.getAttribute(API_KEY_USER_ID.value()));
         LOGGER.info("Request registered with id {}",savedRequest.getRequestId());
         return ResponseEntity.ok(savedRequest);
+    }
+
+    @PostMapping(value = "/signup",produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public UserEntity signup(@RequestBody UserEntity user, HttpServletRequest request,HttpServletResponse response) {
+        return userService.registerUser(user);
     }
 
     @GetMapping(value = "/request",produces = MediaType.APPLICATION_JSON_VALUE)
