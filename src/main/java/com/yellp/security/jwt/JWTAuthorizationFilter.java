@@ -11,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.FilterChain;
@@ -23,19 +24,22 @@ import java.util.Collections;
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     private final String jwtSecret;
 
-    @Autowired
+    private final String tokenPrefix;
+
     private UserRepository userRepository;
 
-    public JWTAuthorizationFilter(AuthenticationManager authenticationManager) {
+    public JWTAuthorizationFilter(AuthenticationManager authenticationManager,UserRepository userRepository) {
         super(authenticationManager);
         jwtSecret = Resource.PROPERTIES.get("security.jwt.signing-key");
+        tokenPrefix = Resource.PROPERTIES.get("security.jwt.token-prefix");
+        this.userRepository = userRepository;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if(authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if(authHeader == null || !authHeader.startsWith(tokenPrefix)) {
             chain.doFilter(request,response);
             return;
         }
@@ -49,9 +53,10 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
         if(StringUtils.isEmpty(authorization))
             return null;
         //parse token
+        String jwt = authorization.replace(tokenPrefix,"");
         String username = JWT.require(Algorithm.HMAC256(jwtSecret))
                 .build()
-                .verify(authorization)
+                .verify(jwt)
                 .getSubject();
         UserEntity userEntity = userRepository.findByUsername(username);
         UsernamePasswordAuthenticationToken token = null;
