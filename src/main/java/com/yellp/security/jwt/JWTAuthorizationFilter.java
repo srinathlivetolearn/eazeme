@@ -5,13 +5,11 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.yellp.dao.UserEntity;
 import com.yellp.repository.UserRepository;
 import com.yellp.utils.Resource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.FilterChain;
@@ -26,13 +24,13 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
     private final String tokenPrefix;
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public JWTAuthorizationFilter(AuthenticationManager authenticationManager,UserRepository userRepository) {
         super(authenticationManager);
+        this.userRepository = userRepository;
         jwtSecret = Resource.PROPERTIES.get("security.jwt.signing-key");
         tokenPrefix = Resource.PROPERTIES.get("security.jwt.token-prefix");
-        this.userRepository = userRepository;
     }
 
     @Override

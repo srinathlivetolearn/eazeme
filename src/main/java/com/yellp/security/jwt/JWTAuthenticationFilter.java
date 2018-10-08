@@ -7,15 +7,11 @@ import com.yellp.dao.UserEntity;
 import com.yellp.utils.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.stereotype.Component;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -28,14 +24,14 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
 
-public class JWTAuthFilter extends UsernamePasswordAuthenticationFilter {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JWTAuthFilter.class);
+public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JWTAuthenticationFilter.class);
 
     private final AuthenticationManager authenticationManager;
 
     private String jwtSecret;
 
-    public JWTAuthFilter(@Autowired AuthenticationManager authenticationManager) {
+    public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
         jwtSecret = Resource.PROPERTIES.get("security.jwt.signing-key");
     }
