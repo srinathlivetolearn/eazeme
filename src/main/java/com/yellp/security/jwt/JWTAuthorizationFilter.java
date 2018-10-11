@@ -22,7 +22,7 @@ import java.util.Collections;
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     private final String jwtSecret;
 
-    private final String tokenPrefix;
+    private final String tokenPrefix = "Bearer ";
 
     private final UserRepository userRepository;
 
@@ -30,7 +30,6 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
         super(authenticationManager);
         this.userRepository = userRepository;
         jwtSecret = Resource.PROPERTIES.get("security.jwt.signing-key");
-        tokenPrefix = Resource.PROPERTIES.get("security.jwt.token-prefix");
     }
 
     @Override
@@ -59,7 +58,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
         UserEntity userEntity = userRepository.findByUsername(username);
         UsernamePasswordAuthenticationToken token = null;
         if(userEntity != null)
-            token = new UsernamePasswordAuthenticationToken(userEntity.getUsername(),userEntity.getPassword(),
+            token = new UsernamePasswordAuthenticationToken(userEntity.getUsername(),null,
                     Collections.emptyList());
         return token;
     }

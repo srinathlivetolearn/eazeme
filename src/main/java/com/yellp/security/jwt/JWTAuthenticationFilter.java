@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
@@ -29,6 +30,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     private final AuthenticationManager authenticationManager;
 
+    private UserEntity user;
+
     private String jwtSecret;
 
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
@@ -39,9 +42,10 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
         try {
-            UserEntity user = new ObjectMapper().readValue(request.getInputStream(),UserEntity.class);
+            user = new ObjectMapper().readValue(request.getInputStream(),UserEntity.class);
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(user.getUsername(),
                     user.getPassword(), Collections.emptyList());
+
             return authenticationManager.authenticate(authToken);
         } catch (IOException e) {
             LOGGER.error("Error while parsing request.",e);
@@ -53,7 +57,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
                                             Authentication authResult) throws IOException, ServletException {
         String token = JWT.create()
-                .withSubject(authResult.getPrincipal().toString())
+                .withSubject(user.getUsername())
                 .withExpiresAt(Date.from(Instant.now().plus(Duration.ofHours(24))))
                 .sign(Algorithm.HMAC256(jwtSecret));
         LOGGER.debug("Generated token for user {} : {}",authResult.getPrincipal(),token);

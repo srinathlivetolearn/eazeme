@@ -23,7 +23,6 @@ import java.util.Objects;
 import static com.yellp.utils.Constants.API_KEY_USER_ID;
 
 @RestController
-@RequestMapping("/api")
 public class CustomerRequestController {
 
     @Autowired

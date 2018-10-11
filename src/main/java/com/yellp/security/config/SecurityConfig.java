@@ -23,7 +23,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    UserRepository repository;
+    private UserRepository userRepository;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -35,13 +35,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers("/api/**")
-                .authenticated()
-                .antMatchers("/api/signup","/**")
+                .antMatchers("/signup/**","/callme/**","/ping/**")
                 .permitAll()
+                .anyRequest()
+                .authenticated()
                 .and()
-                .addFilter(new JWTAuthorizationFilter(authenticationManager(),repository))
                 .addFilter(new JWTAuthenticationFilter(authenticationManager()))
+                .addFilter(new JWTAuthorizationFilter(authenticationManager(),userRepository))
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
