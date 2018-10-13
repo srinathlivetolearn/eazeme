@@ -4,6 +4,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yellp.dao.UserEntity;
+import com.yellp.dao.UserSessionEntity;
+import com.yellp.services.UserSessionService;
 import com.yellp.utils.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
@@ -20,22 +21,23 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Collections;
-import java.util.Date;
+import java.util.Objects;
 
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(JWTAuthenticationFilter.class);
 
     private final AuthenticationManager authenticationManager;
 
+    private final UserSessionService sessionService;
+
     private UserEntity user;
 
     private String jwtSecret;
 
-    public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
+    public JWTAuthenticationFilter(AuthenticationManager authenticationManager,UserSessionService sessionService) {
         this.authenticationManager = authenticationManager;
+        this.sessionService = sessionService;
         jwtSecret = Resource.PROPERTIES.get("security.jwt.signing-key");
     }
 
@@ -56,9 +58,15 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
                                             Authentication authResult) throws IOException, ServletException {
+        UserSessionEntity session = new UserSessionEntity();
+        session.setUsername(user.getUsername());
+        sessionService.getActiveSessionForUser(user.getUsername())
+                .ifPresent(entity->sessionService.invalidateSession(entity.getSessionId()));
+        session = Objects.requireNonNull(sessionService.createSession(session));
         String token = JWT.create()
                 .withSubject(user.getUsername())
-                .withExpiresAt(Date.from(Instant.now().plus(Duration.ofHours(24))))
+                .withExpiresAt(session.getExpires())
+                .withJWTId(session.getSessionId())
                 .sign(Algorithm.HMAC256(jwtSecret));
         LOGGER.debug("Generated token for user {} : {}",authResult.getPrincipal(),token);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -66,4 +74,5 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         writer.write(String.format("{\"status\":\"success\",\"token\":\"%s\"}",token));
         writer.flush();
     }
+
 }

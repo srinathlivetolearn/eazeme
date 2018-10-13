@@ -2,8 +2,9 @@ package com.yellp.security.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.yellp.dao.UserEntity;
-import com.yellp.repository.UserRepository;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.yellp.dao.UserSessionEntity;
+import com.yellp.services.UserSessionService;
 import com.yellp.utils.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,17 +19,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Optional;
 
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     private final String jwtSecret;
 
     private final String tokenPrefix = "Bearer ";
 
-    private final UserRepository userRepository;
+    private final UserSessionService sessionService;
 
-    public JWTAuthorizationFilter(AuthenticationManager authenticationManager,UserRepository userRepository) {
+    public JWTAuthorizationFilter(AuthenticationManager authenticationManager,UserSessionService sessionService) {
         super(authenticationManager);
-        this.userRepository = userRepository;
+        this.sessionService = sessionService;
         jwtSecret = Resource.PROPERTIES.get("security.jwt.signing-key");
     }
 
@@ -49,16 +51,14 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
         String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
         if(StringUtils.isEmpty(authorization))
             return null;
-        //parse token
         String jwt = authorization.replace(tokenPrefix,"");
-        String username = JWT.require(Algorithm.HMAC256(jwtSecret))
-                .build()
-                .verify(jwt)
-                .getSubject();
-        UserEntity userEntity = userRepository.findByUsername(username);
+        DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC256(jwtSecret)).build().verify(jwt);
+        String username = decodedJWT.getSubject();
+        String sessionId = decodedJWT.getId();
+        Optional<UserSessionEntity> session = sessionService.getActiveSessionForUser(username);
         UsernamePasswordAuthenticationToken token = null;
-        if(userEntity != null)
-            token = new UsernamePasswordAuthenticationToken(userEntity.getUsername(),null,
+        if(session.isPresent() && sessionId.equals(session.get().getSessionId()))
+            token = new UsernamePasswordAuthenticationToken(session.get().getUsername(),null,
                     Collections.emptyList());
         return token;
     }

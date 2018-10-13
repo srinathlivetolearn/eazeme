@@ -1,8 +1,8 @@
 package com.yellp.security.config;
 
-import com.yellp.repository.UserRepository;
 import com.yellp.security.jwt.JWTAuthenticationFilter;
 import com.yellp.security.jwt.JWTAuthorizationFilter;
+import com.yellp.services.UserSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -23,7 +23,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserSessionService sessionService;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -35,13 +35,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers("/signup/**","/callme/**","/ping/**")
+                .antMatchers("/api/signup/**","/api/callme/**","/api/logout","/ping/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
-                .addFilter(new JWTAuthenticationFilter(authenticationManager()))
-                .addFilter(new JWTAuthorizationFilter(authenticationManager(),userRepository))
+                .addFilter(new JWTAuthenticationFilter(authenticationManager(), sessionService))
+                .addFilter(new JWTAuthorizationFilter(authenticationManager(), sessionService))
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
