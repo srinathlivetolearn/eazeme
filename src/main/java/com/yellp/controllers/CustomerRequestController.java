@@ -8,6 +8,7 @@ import com.yellp.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -68,5 +69,10 @@ public class CustomerRequestController {
         if(supportRequestService.processRequest(requestId))
             return ResponseEntity.ok().build();
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Failed to update status.");
+    }
+
+    @PostMapping(value = "/logout",produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> logout(HttpServletRequest request,HttpServletResponse response) {
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 }
