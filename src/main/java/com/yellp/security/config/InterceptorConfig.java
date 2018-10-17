@@ -13,6 +13,6 @@ public class InterceptorConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(apiKeyValidator).addPathPatterns("/callme/**");
+        registry.addInterceptor(apiKeyValidator).addPathPatterns("/api/callme/**");
     }
 }
