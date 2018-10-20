@@ -1,0 +1,50 @@
+version: "3.1"
+
+services:
+  yellp-request-gateway:
+    image: geekydaemon/yellp-request-gateway:latest
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - 8989:8989
+    depends_on:
+      - mysqldb
+      - rabbit
+    networks:
+      - yellpnet
+
+  mysqldb:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: p@ssword
+    networks:
+    - yellpnet
+
+  rabbit:
+    image: rabbitmq:management
+    ports:
+    - 5672:5672
+    - 15672:15672
+    networks:
+    - yellpnet
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    environment:
+    - PMA_ARBITRARY=1
+    restart: always
+    ports:
+    - 7777:80
+    volumes:
+    - /sessions
+    networks:
+      - yellpnet
+
+networks:
+  yellpnet:
+    driver: bridge

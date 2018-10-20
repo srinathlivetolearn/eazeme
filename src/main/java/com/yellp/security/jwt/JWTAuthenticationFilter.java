@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yellp.dao.UserEntity;
 import com.yellp.dao.UserSessionEntity;
 import com.yellp.services.UserSessionService;
-import com.yellp.utils.Resource;
+import com.yellp.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -33,12 +33,9 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     private UserEntity user;
 
-    private String jwtSecret;
-
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager,UserSessionService sessionService) {
         this.authenticationManager = authenticationManager;
         this.sessionService = sessionService;
-        jwtSecret = Resource.PROPERTIES.get("security.jwt.signing-key");
     }
 
     @Override
@@ -67,7 +64,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .withSubject(user.getUsername())
                 .withExpiresAt(session.getExpires())
                 .withJWTId(session.getSessionId())
-                .sign(Algorithm.HMAC256(jwtSecret));
+                .sign(Algorithm.HMAC256(Constants.JWT_SECRET.value()));
         LOGGER.debug("Generated token for user {} : {}",authResult.getPrincipal(),token);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         BufferedWriter writer = new BufferedWriter(response.getWriter());

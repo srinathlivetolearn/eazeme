@@ -1,7 +1,8 @@
 package com.yellp.utils;
 
 public enum Constants {
-    API_KEY_USER_ID("Api key user id");
+    API_KEY_USER_ID("Api key user id"),
+    JWT_SECRET("AAAAE2VjZHNhLXNoY");
 
     private String value;
 
