@@ -12,7 +12,7 @@ import org.springframework.util.StringUtils;
 import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -51,7 +51,7 @@ public class SupportRequestServiceImpl implements SupportRequestService {
         List<SupportRequestDao> results;
         if(StringUtils.hasText(requestId)) {
             SupportRequestDao request = supportRequestRepository.findByRequestId(requestId);
-            results = Collections.emptyList();
+            results = new ArrayList<>();
             if(request != null)
                 results.add(request);
         }else {
