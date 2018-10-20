@@ -5,7 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.yellp.dao.UserSessionEntity;
 import com.yellp.services.UserSessionService;
-import com.yellp.utils.Resource;
+import com.yellp.utils.Constants;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,8 +22,6 @@ import java.util.Collections;
 import java.util.Optional;
 
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
-    private final String jwtSecret;
-
     private final String tokenPrefix = "Bearer ";
 
     private final UserSessionService sessionService;
@@ -31,7 +29,6 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     public JWTAuthorizationFilter(AuthenticationManager authenticationManager,UserSessionService sessionService) {
         super(authenticationManager);
         this.sessionService = sessionService;
-        jwtSecret = Resource.PROPERTIES.get("security.jwt.signing-key");
     }
 
     @Override
@@ -52,7 +49,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
         if(StringUtils.isEmpty(authorization))
             return null;
         String jwt = authorization.replace(tokenPrefix,"");
-        DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC256(jwtSecret)).build().verify(jwt);
+        DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC256(Constants.JWT_SECRET.value())).build().verify(jwt);
         String username = decodedJWT.getSubject();
         String sessionId = decodedJWT.getId();
         Optional<UserSessionEntity> session = sessionService.getActiveSessionForUser(username);

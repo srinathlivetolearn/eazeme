@@ -10,7 +10,7 @@ import java.nio.file.Paths;
 import java.util.Properties;
 
 public enum Resource {
-    PROPERTIES(Paths.get("src\\main\\resources", "application.properties"));
+    PROPERTIES(Paths.get("src","main","resources", "application.properties"));
 
     private Properties properties;
 
