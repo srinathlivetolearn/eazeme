@@ -55,8 +55,8 @@ public class CustomerRequestController {
 
     @GetMapping(value = "/request",produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<List<SupportRequestDao>> allRequests(
-            @RequestParam(name = "requestid",defaultValue = "") String requestId) {
+    public ResponseEntity<List<SupportRequestDao>> allRequests(@RequestParam(name = "requestid",defaultValue = "")
+                                                                           String requestId) {
         List<SupportRequestDao> requests = supportRequestService.findRequest(requestId);
         if(!requests.isEmpty())
             return ResponseEntity.ok(requests);
