@@ -1,0 +1,46 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: request-gateway-deployment
+  labels:
+    app: request-gateway
+    type: core-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: request-gateway
+  template:
+    metadata:
+      labels:
+        app: request-gateway
+        type: core-app
+    spec:
+      containers:
+        - name: yellp
+          image: geekydaemon/yellp-request-gateway
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://mariadb:3306/yellpdb?useSSL=false
+            - name: SPRING_DATASOURCE_USERNAME
+              value: root
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: s3cret
+            - name: SPRING_RABBITMQ_HOST
+              value: rabbitmq
+          ports:
+            - containerPort: 8989
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: request-gateway
+spec:
+  selector:
+    app: request-gateway
+  ports:
+    - port: 8989
+      targetPort: 8989
+  type: LoadBalancer
